@@ -1,31 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>AR Promo</title>
+<meta charset="utf-8">
+<title>AR Video</title>
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+}
 
-    <script type="module" src="/main.js"></script>
+#social{
+    position:fixed;
+    right:20px;
+    top:50%;
+    transform:translateY(-50%);
+    display:none;
+    flex-direction:column;
+    gap:15px;
+    z-index:9999;
+}
 
-    <link rel="stylesheet" href="/style.css">
+#social a{
+    background:white;
+    padding:10px;
+    border-radius:10px;
+    text-decoration:none;
+}
+</style>
 </head>
 
 <body>
 
 <div id="social">
-
-    <a href="https://instagram.com/tuusuario">
-        <img src="/instagram.png">
-    </a>
-
-    <a href="https://tiktok.com/@tuusuario">
-        <img src="/tiktok.png">
-    </a>
-
-    <a href="https://wa.me/51999999999">
-        <img src="/whatsapp.png">
-    </a>
-
+    <a href="https://instagram.com">Instagram</a>
+    <a href="https://tiktok.com">TikTok</a>
+    <a href="https://wa.me/51999999999">WhatsApp</a>
 </div>
+
+<script type="module" src="./main.js"></script>
 
 </body>
 </html>

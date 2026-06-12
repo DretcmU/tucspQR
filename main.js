@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 
 const scene = new THREE.Scene();
 
@@ -27,6 +28,12 @@ document.body.appendChild(
     renderer.domElement
 );
 
+document.body.appendChild(
+    ARButton.createButton(renderer,{
+        requiredFeatures:['hit-test']
+    })
+);
+
 const light =
     new THREE.HemisphereLight(
         0xffffff,
@@ -39,30 +46,96 @@ scene.add(light);
 const video =
     document.createElement("video");
 
-video.src="/video.mp4";
-video.loop=true;
-video.muted=true;
-video.play();
+video.src = "/video.mp4";
+video.loop = true;
+video.muted = true;
+video.playsInline = true;
+
+await video.play();
 
 const texture =
     new THREE.VideoTexture(video);
 
 const plane =
     new THREE.Mesh(
-        new THREE.PlaneGeometry(2,1.1),
+        new THREE.PlaneGeometry(1.8,1),
         new THREE.MeshBasicMaterial({
             map:texture
         })
     );
 
-plane.position.set(0,1,-3);
+plane.visible = false;
 
 scene.add(plane);
 
-renderer.setAnimationLoop(() =>
-{
-    renderer.render(
-        scene,
-        camera
-    );
+let hitTestSource = null;
+let hitTestSourceRequested = false;
+
+renderer.setAnimationLoop((timestamp,frame)=>{
+
+    if(frame){
+
+        const referenceSpace =
+            renderer.xr.getReferenceSpace();
+
+        const session =
+            renderer.xr.getSession();
+
+        if(!hitTestSourceRequested){
+
+            session.requestReferenceSpace(
+                'viewer'
+            ).then((viewerSpace)=>{
+
+                session.requestHitTestSource({
+                    space:viewerSpace
+                }).then((source)=>{
+                    hitTestSource=source;
+                });
+
+            });
+
+            hitTestSourceRequested=true;
+
+            session.addEventListener('end',()=>{
+
+                hitTestSourceRequested=false;
+                hitTestSource=null;
+
+            });
+        }
+
+        if(hitTestSource){
+
+            const hits =
+                frame.getHitTestResults(
+                    hitTestSource
+                );
+
+            if(hits.length){
+
+                const hit = hits[0];
+
+                const pose =
+                    hit.getPose(
+                        referenceSpace
+                    );
+
+                plane.visible=true;
+
+                plane.position.set(
+                    pose.transform.position.x,
+                    pose.transform.position.y+0.7,
+                    pose.transform.position.z
+                );
+
+                document
+                    .getElementById('social')
+                    .style.display='flex';
+            }
+        }
+    }
+
+    renderer.render(scene,camera);
+
 });
