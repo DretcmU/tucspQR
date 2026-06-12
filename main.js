@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
+import * as THREE from 'https://unpkg.com/three@0.181.1/build/three.module.js';
+import { ARButton } from 'https://unpkg.com/three@0.181.1/examples/jsm/webxr/ARButton.js';
 
 const scene = new THREE.Scene();
 
