@@ -68,7 +68,7 @@ map:texture
 })
 );
 
-screen.visible=false;
+screen.visible=true;
 
 scene.add(screen);
 
@@ -82,72 +82,13 @@ video.addEventListener('loadeddata', () => {
     console.log("Video cargado");
 });
 
+screen.position.set(
+    0,
+    0,
+    -2
+);
+
 renderer.setAnimationLoop((timestamp, frame) => {
-
-    if (frame) {
-
-        const session = renderer.xr.getSession();
-        const referenceSpace = renderer.xr.getReferenceSpace();
-
-        if (!hitTestRequested) {
-
-            session
-                .requestReferenceSpace('viewer')
-                .then((viewerSpace) => {
-
-                    session
-                        .requestHitTestSource({
-                            space: viewerSpace
-                        })
-                        .then((source) => {
-
-                            hitTestSource = source;
-
-                        });
-
-                });
-
-            hitTestRequested = true;
-        }
-
-        if (hitTestSource) {
-
-            const hits =
-                frame.getHitTestResults(
-                    hitTestSource
-                );
-
-            if (hits.length) {
-
-                const hit = hits[0];
-
-                const pose =
-                    hit.getPose(
-                        referenceSpace
-                    );
-
-                screen.visible = true;
-
-                screen.position.set(
-                    pose.transform.position.x,
-                    pose.transform.position.y + 0.8,
-                    pose.transform.position.z
-                );
-
-                screen.lookAt(
-                    camera.position
-                );
-
-                video.play();
-
-                const social =
-                    document.getElementById("social");
-
-                if (social)
-                    social.style.display = "flex";
-            }
-        }
-    }
 
     renderer.render(
         scene,
