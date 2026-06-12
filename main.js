@@ -76,6 +76,12 @@ let hitTestSource=null;
 let hitTestRequested=false;
 
 
+video.load();
+
+video.addEventListener('loadeddata', () => {
+    console.log("Video cargado");
+});
+
 renderer.setAnimationLoop((timestamp, frame) => {
 
     if (frame) {
