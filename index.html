@@ -1,44 +1,85 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>MindAR Debug</title>
+<title>AR Video</title>
 
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
 <style>
 
-html, body{
+html,
+body{
     margin:0;
     width:100%;
     height:100%;
     overflow:hidden;
+    font-family:Arial;
+}
+
+#social{
+
+    position:fixed;
+
+    right:15px;
+    top:50%;
+
+    transform:translateY(-50%);
+
+    display:none;
+
+    flex-direction:column;
+
+    gap:15px;
+
+    z-index:999999;
+}
+
+#social a{
+
+    width:65px;
+    height:65px;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    background:white;
+
+    border-radius:15px;
+
+    box-shadow:0 0 15px rgba(0,0,0,0.3);
+}
+
+#social img{
+
+    width:45px;
+    height:45px;
 }
 
 #log{
+
     position:fixed;
 
-    left:10px;
     top:10px;
+    left:10px;
 
-    width:90%;
-    max-height:40%;
-
-    overflow:auto;
-
-    background:rgba(0,0,0,0.8);
+    background:rgba(0,0,0,0.75);
 
     color:#00ff00;
-
-    font-family:monospace;
-    font-size:14px;
 
     padding:10px;
 
     z-index:999999;
+
+    font-size:12px;
+
+    max-width:300px;
 }
 
 </style>
@@ -47,39 +88,101 @@ html, body{
 
 <body>
 
-<div id="log"></div>
+<div id="log">
+Iniciando...
+</div>
+
+<div id="social">
+
+    <a
+    href="https://instagram.com/tuna.ucsp"
+    target="_blank">
+
+        <img src="instagram.png">
+
+    </a>
+
+    <a
+    href="https://facebook.com/tunaucsp"
+    target="_blank">
+
+        <img src="facebook.png">
+
+    </a>
+
+    <a
+    href="https://tiktok.com/@dretcm"
+    target="_blank">
+
+        <img src="tiktok.png">
+
+    </a>
+
+    <a
+    href="https://wa.me/51999999999"
+    target="_blank">
+
+        <img src="whatsapp.png">
+
+    </a>
+
+</div>
 
 <a-scene
-    id="scene"
-    mindar-image="
-        imageTargetSrc: ./target.mind;
-        autoStart: true;
-        uiScanning: true;
-        uiLoading: true;
-    "
-    color-space="sRGB"
-    renderer="colorManagement: true"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false"
+
+mindar-image="
+imageTargetSrc: ./targets.mind;
+autoStart: true;
+uiScanning: true;
+uiLoading: true;
+"
+
+color-space="sRGB"
+
+renderer="
+colorManagement:true;
+physicallyCorrectLights:true;
+"
+
+vr-mode-ui="enabled:false"
+
+device-orientation-permission-ui="
+enabled:false
+"
+
 >
 
-    <a-camera
-        position="0 0 0"
-        look-controls="enabled:false">
-    </a-camera>
+<a-assets>
 
-    <a-entity
-        id="target"
-        mindar-image-target="targetIndex: 0">
+<video
+id="promo"
+src="./video.mp4"
+loop
+muted
+playsinline
+crossorigin="anonymous"
+></video>
 
-        <a-box
-            color="red"
-            width="0.3"
-            height="0.3"
-            depth="0.3">
-        </a-box>
+</a-assets>
 
-    </a-entity>
+<a-camera
+position="0 0 0"
+look-controls="enabled:false">
+</a-camera>
+
+<a-entity
+id="target"
+mindar-image-target="targetIndex: 0">
+
+    <a-video
+    src="#promo"
+    position="0 0.4 0"
+    width="1.8"
+    height="1.0"
+    rotation="0 0 0">
+    </a-video>
+
+</a-entity>
 
 </a-scene>
 
@@ -92,110 +195,71 @@ function log(msg)
 {
     console.log(msg);
 
-    logDiv.innerHTML += msg + "<br>";
-
-    logDiv.scrollTop =
-    logDiv.scrollHeight;
+    logDiv.innerHTML +=
+    "<br>" + msg;
 }
 
 log("Pagina iniciada");
 
-window.onerror =
-function(msg, src, line)
-{
-    log(
-        "ERROR: " +
-        msg +
-        " linea:" +
-        line
-    );
-};
+const target =
+document.getElementById("target");
 
-if(window.AFRAME)
-{
-    log("AFRAME OK");
-}
-else
-{
-    log("AFRAME NO CARGADO");
-}
+const social =
+document.getElementById("social");
 
-fetch("./target.mind")
-.then(r =>
-{
-    log(
-        "target.mind status = " +
-        r.status
-    );
+const video =
+document.getElementById("promo");
 
-    return r.blob();
-})
-.then(blob =>
-{
-    log(
-        "target.mind bytes = " +
-        blob.size
-    );
-})
-.catch(err =>
-{
-    log(
-        "ERROR cargando target.mind"
-    );
+target.addEventListener(
+"targetFound",
+async ()=>{
+
+    log("TARGET ENCONTRADO");
+
+    social.style.display =
+    "flex";
+
+    try
+    {
+        await video.play();
+
+        log(
+        "VIDEO REPRODUCIENDO"
+        );
+    }
+    catch(err)
+    {
+        log(
+        "ERROR VIDEO: "
+        + err
+        );
+    }
+
 });
 
-const scene =
-document.querySelector("#scene");
-
-scene.addEventListener(
-    "loaded",
-    () =>
-    {
-        log("SCENE LOADED");
-    }
-);
-
-scene.addEventListener(
-    "renderstart",
-    () =>
-    {
-        log("RENDER START");
-    }
-);
-
-const target =
-document.querySelector("#target");
-
 target.addEventListener(
-    "targetFound",
-    () =>
-    {
-        log(
-            "TARGET ENCONTRADO"
-        );
-    }
-);
+"targetLost",
+()=>{
 
-target.addEventListener(
-    "targetLost",
-    () =>
-    {
-        log(
-            "TARGET PERDIDO"
-        );
-    }
-);
+    log("TARGET PERDIDO");
 
-setInterval(
-    () =>
-    {
-        log("heartbeat");
-    },
-    5000
-);
+    social.style.display =
+    "none";
+
+    video.pause();
+
+});
+
+window.onerror =
+function(msg)
+{
+    log(
+    "ERROR: "
+    + msg
+    );
+};
 
 </script>
 
 </body>
 </html>
-
